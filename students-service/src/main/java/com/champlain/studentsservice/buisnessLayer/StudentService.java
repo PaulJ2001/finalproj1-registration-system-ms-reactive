@@ -9,4 +9,11 @@ public interface StudentService {
     Flux<StudentResponseDTO> getAllStudents();
     Mono<StudentResponseDTO> addStudent(Mono<StudentRequestDTO> studentRequestDTO);
 
+    Mono<StudentResponseDTO> getStudentByStudentId(String studentId);
+
+    Mono<Void> deleteStudent(String studentId);
+
+    Mono<StudentResponseDTO> updateStudent(String studentId, Mono<StudentRequestDTO> studentRequestDTO)
+            ;
+
 }

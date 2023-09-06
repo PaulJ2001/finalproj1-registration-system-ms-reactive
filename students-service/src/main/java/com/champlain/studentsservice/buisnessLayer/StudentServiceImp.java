@@ -1,7 +1,6 @@
 package com.champlain.studentsservice.buisnessLayer;
 
 import com.champlain.studentsservice.Utils.EntityDTOUtils;
-import com.champlain.studentsservice.dataaccesslayer.Student;
 import com.champlain.studentsservice.dataaccesslayer.StudentRepository;
 import com.champlain.studentsservice.presentationlayer.StudentRequestDTO;
 import com.champlain.studentsservice.presentationlayer.StudentResponseDTO;
@@ -35,6 +34,43 @@ public class StudentServiceImp  implements StudentService{
 
     }
 
+    @Override
+    public Mono<StudentResponseDTO> getStudentByStudentId(String studentId) {
+        return studentRepository.findStudentByStudentId(studentId)
+                .map(EntityDTOUtils::toStudentResponseDTO);
+
+    }
+
+    @Override
+    public Mono<Void> deleteStudent(String studentId) {
+        return studentRepository.findStudentByStudentId(studentId)
+                .flatMap(studentRepository::delete);
+
+
+
+    }
+
+
+    @Override
+    public Mono<StudentResponseDTO> updateStudent(String studentId, Mono<StudentRequestDTO> studentRequestDTO) {
+        return studentRepository.findStudentByStudentId(studentId)
+                .flatMap(student -> studentRequestDTO
+                                .map(EntityDTOUtils::toStudentEntity)
+                                .doOnNext(e ->
+                                    e.setStudentId(student.getStudentId()))
+                                .doOnNext(e -> e.setId(student.getId()))
+                .flatMap(studentRepository::save)
+                .map(EntityDTOUtils::toStudentResponseDTO));
+
+    }
+
+
+
+
+
 
 
 }
+
+
+

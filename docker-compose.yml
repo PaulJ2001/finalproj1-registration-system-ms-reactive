@@ -1,14 +1,63 @@
 services:
+
+  sections-service:
+    build: sections-service
+    hostname: sections-service
+    container_name: sections-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - postgres
+      - students-service
+      - courses-service
+
   students-service:
-    build:
-      students-service
+    build: students-service
     hostname: students-service
+    container_name: students-service
     ports:
       - "8081:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - mongodb1
+
+
+  courses-service:
+    build: courses-service
+    hostname: courses-service
+    container_name: courses-service
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - mongodb2
+
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pwd
+      - POSTGRES_DB=enrollments
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@james.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "9000:80"
+    depends_on:
+      - postgres
 
   mongodb1:
     image: mongo
@@ -17,8 +66,18 @@ services:
       - "27017:27017"
 
     environment:
-     - MONGO_INITDB_ROOT_USERNAME=user
-     - MONGO_INITDB_ROOT_PASSWORD=pwd
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pwd
+
+  mongodb2:
+    image: mongo
+    container_name: mongo_db2
+    ports:
+      - "27018:27017"
+
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=pwd
 
   mongo-express1:
     image: mongo-express
@@ -33,6 +92,20 @@ services:
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
     depends_on:
       - mongodb1
+
+  mongo-express2:
+    image: mongo-express
+    container_name: mongo-express2
+    restart: always
+    ports:
+      - "8092:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=user
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=pwd
+      - ME_CONFIG_MONGODB_SERVER=mongodb2
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+    depends_on:
+      - mongodb2
 
 
 

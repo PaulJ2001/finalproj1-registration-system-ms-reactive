@@ -32,4 +32,32 @@ public class StudentController {
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 
+    @GetMapping(value = "{studentId}")
+    public Mono<ResponseEntity<StudentResponseDTO>> getStudentByStudentId(@PathVariable String studentId)
+    {
+        return  studentService.getStudentByStudentId(studentId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping(value = "{studentId}")
+    public Mono<ResponseEntity<Void>> delStudentByStudentId(@PathVariable String studentId) {
+        return studentService.deleteStudent(studentId)
+                .then(Mono.just(ResponseEntity.notFound().build()));
+
+
+    }
+
+    @PutMapping(value = "{studentId}")
+    public Mono<ResponseEntity<StudentResponseDTO>> updateStudentByStudentId
+            (@PathVariable String studentId, @RequestBody Mono<StudentRequestDTO> studentRequestDTO)
+    {
+        return studentService.updateStudent(studentId, studentRequestDTO)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+
+
+
 }
