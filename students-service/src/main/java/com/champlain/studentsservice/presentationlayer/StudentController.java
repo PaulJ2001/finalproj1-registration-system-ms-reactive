@@ -43,7 +43,7 @@ public class StudentController {
     @DeleteMapping(value = "{studentId}")
     public Mono<ResponseEntity<Void>> delStudentByStudentId(@PathVariable String studentId) {
         return studentService.deleteStudent(studentId)
-                .then(Mono.just(ResponseEntity.notFound().build()));
+                .then(Mono.just(ResponseEntity.noContent().build()));
 
 
     }

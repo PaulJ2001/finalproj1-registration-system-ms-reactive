@@ -23,9 +23,38 @@ ext {
 	lombokVersion = "1.18.26"
 	lombokMapstructBindingVersion = "0.2.0"
 }
-
+/*
 dependencies {
 
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    implementation 'org.testng:testng:7.1.0'
+	implementation 'org.springframework.boot:spring-boot-test:3.0.2'
+	implementation 'org.springframework.boot:spring-boot-test-autoconfigure:3.0.2'
+	implementation 'org.springframework:spring-test:6.0.2'
+	implementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+	implementation 'org.assertj:assertj-core:3.23.1'
+
+	implementation 'io.projectreactor:reactor-test:3.5.2'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}", "org.projectlombok:lombok:${lombokVersion}", "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+	//testImplementation 'de.flapdoodle.embed.de:flapdoodle.embed.mongo.spring30x:4.6.2'
+	//testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring27x:4.6.2'
+	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.9.2'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.r2dbc:r2dbc-h2:1.0.0.RELEASE'
+	//testImplementation 'org.hamcrest:hamcrest-all:1.3'
+	testImplementation 'io.projectreactor:reactor-test'
+	//testImplementation 'io.projectreactor:reactor-test:3.5.2'
+} */
+
+dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
@@ -35,13 +64,9 @@ dependencies {
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}", "org.projectlombok:lombok:${lombokVersion}", "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
-	//testImplementation 'de.flapdoodle.embed.de:flapdoodle.embed.mongo.spring30x:4.6.2'
-	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring27x:4.6.2'
+	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.9.2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
-
-
-
 }
 
 jacoco {
@@ -74,6 +99,7 @@ test.finalizedBy jacocoTestReport
 check.dependsOn jacocoTestCoverageVerification
 
 test {
+	jvmArgs'--enable-preview'
 	useJUnitPlatform()
 	testLogging {
 		events "passed", "skipped", "failed"

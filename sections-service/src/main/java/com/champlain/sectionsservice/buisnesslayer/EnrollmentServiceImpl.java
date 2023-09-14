@@ -1,15 +1,15 @@
 package com.champlain.sectionsservice.buisnesslayer;
 
 import com.champlain.sectionsservice.Utils.EntityDTOUtils;
+import com.champlain.sectionsservice.Utils.exceptions.InvalidInputException;
+import com.champlain.sectionsservice.Utils.exceptions.NotFoundException;
 import com.champlain.sectionsservice.dataaccesslayer.EnrollmentRepository;
-import com.champlain.sectionsservice.presentationlayer.EnrollmentResponseDTO;
 import com.champlain.sectionsservice.domainclientlayer.CourseClient;
 import com.champlain.sectionsservice.domainclientlayer.StudentClient;
 import com.champlain.sectionsservice.presentationlayer.EnrollmentRequestDTO;
-
+import com.champlain.sectionsservice.presentationlayer.EnrollmentResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -44,12 +44,37 @@ public class EnrollmentServiceImpl implements EnrollmentService{
 
         String course = queryParams.get("courseId");
         String student = queryParams.get("studentId");
-        String year = (queryParams.get("year"));
+        String enrollYear = (queryParams.get("enrollYear"));
         Integer enrollmentYear = null;
 
-        if (year != null) {
-            enrollmentYear = Integer.parseInt(year);
+        try {
+            if (enrollYear != null) {
+                enrollmentYear = Integer.parseInt(enrollYear);
+            }
+        }catch(Exception ex){
+            return Flux.error(new InvalidInputException("Invalid Enrollment year: " + enrollmentYear + " Please Confirm Valid Interger Enrollment year"));
         }
+
+        if (student != null && course != null && enrollmentYear != null){
+            return enrollmentRepository.findEnrollmentByStudentIdAndCourseIdAndEnrollmentYear(student, course, enrollmentYear)
+                    .map(EntityDTOUtils::toEnrollmentResponseDTO);
+        }
+
+        if(course != null && enrollmentYear != null){
+            return enrollmentRepository.findEnrollmentByCourseIdAndEnrollmentYear(course, enrollmentYear)
+                    .map(EntityDTOUtils::toEnrollmentResponseDTO);
+        }
+
+        if(student != null && enrollmentYear != null){
+            return enrollmentRepository.findEnrollmentByStudentIdAndEnrollmentYear(student, enrollmentYear)
+                    .map(EntityDTOUtils::toEnrollmentResponseDTO);
+        }
+
+        if(student != null && course != null){
+            return enrollmentRepository.findEnrollmentByStudentIdAndCourseId(student, course)
+                    .map(EntityDTOUtils::toEnrollmentResponseDTO);
+        }
+
         if(student != null){
             return enrollmentRepository.findEnrollmentByStudentId(student)
                     .map(EntityDTOUtils::toEnrollmentResponseDTO);
@@ -60,30 +85,16 @@ public class EnrollmentServiceImpl implements EnrollmentService{
                     .map(EntityDTOUtils::toEnrollmentResponseDTO);
         }
 
-        if(year != null){
+        if(enrollmentYear != null){
             return  enrollmentRepository.findEnrollmentByEnrollmentYear(enrollmentYear)
                     .map(EntityDTOUtils::toEnrollmentResponseDTO);
         }
 
-        if(student != null && course != null){
-            return enrollmentRepository.findEnrollmentByStudentIdAndCourseId(student, course)
-                    .map(EntityDTOUtils::toEnrollmentResponseDTO);
-        }
 
-        if(student != null && year != null){
-            return enrollmentRepository.findEnrollmentByStudentIdAndEnrollmentYear(student, enrollmentYear)
-                    .map(EntityDTOUtils::toEnrollmentResponseDTO);
-        }
 
-        if(course != null && year != null){
-            return enrollmentRepository.findEnrollmentByCourseIdAndEnrollmentYear(course, enrollmentYear)
-                    .map(EntityDTOUtils::toEnrollmentResponseDTO);
-        }
 
-        if (student != null && course != null & year != null){
-            return enrollmentRepository.findEnrollmentByStudentIdAndCourseIdAndEnrollmentYear(student, course, enrollmentYear)
-                    .map(EntityDTOUtils::toEnrollmentResponseDTO);
-        }
+
+
 
         return enrollmentRepository.findAll()
                 .map(EntityDTOUtils::toEnrollmentResponseDTO);
@@ -92,18 +103,21 @@ public class EnrollmentServiceImpl implements EnrollmentService{
     @Override
     public Mono<EnrollmentResponseDTO> getEnrollmentByEnrollmentId(String enrollmentId) {
         return enrollmentRepository.getEnrollmentByEnrollmentId(enrollmentId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Enrollment Id: " + enrollmentId  + "not found")))
                 .map(EntityDTOUtils::toEnrollmentResponseDTO);
     }
 
     @Override
     public Mono<Void> deleteEnrollment(String enrollmentId) {
         return enrollmentRepository.getEnrollmentByEnrollmentId(enrollmentId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Enrollment Id: " + enrollmentId + " not found")))
                 .flatMap(enrollmentRepository::delete);
     }
 
     @Override
     public Mono<EnrollmentResponseDTO> updateEnrollment(String enrollmentId, Mono<EnrollmentRequestDTO> enrollmentRequestDTO) {
         return enrollmentRepository.getEnrollmentByEnrollmentId(enrollmentId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Enrollment Id: " + enrollmentId + " not found")))
 
                 .flatMap(
                         enrollDTO -> enrollmentRequestDTO

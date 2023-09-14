@@ -1,6 +1,7 @@
 package com.champlain.courseservice.buisnesslayer;
 
 import com.champlain.courseservice.Utils.EntityDTOUtils;
+import com.champlain.courseservice.Utils.exceptions.NotFoundException;
 import com.champlain.courseservice.dataaccesslayer.CourseRepository;
 import com.champlain.courseservice.presentationlayer.CourseRequestDTO;
 import com.champlain.courseservice.presentationlayer.CourseResponseDTO;
@@ -21,12 +22,14 @@ public class CourseServiceImpl implements CourseService {
     public Flux<CourseResponseDTO> getAllCourses() {
         return courseRepository.findAll()
                 .map(EntityDTOUtils::toCourseResponseDTO);
+
     }
 
     @Override
     public Mono<CourseResponseDTO> getCourseByCourseId(String courseId) {
         return courseRepository.findCourseByCourseId(courseId)
-                .map(EntityDTOUtils::toCourseResponseDTO);
+                .map(EntityDTOUtils::toCourseResponseDTO)
+                .switchIfEmpty(Mono.error(new NotFoundException("CourseId: " +  courseId + " not found")));
     }
 
     @Override

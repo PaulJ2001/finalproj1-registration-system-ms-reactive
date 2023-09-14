@@ -11,6 +11,8 @@ spring:
     activate:
       on:profile: default
 
+
+
   data:
     mongodb:
       port: 0
@@ -18,6 +20,16 @@ spring:
   mongodb:
     embedded:
       version: 4.0.21
+
+de.flapdoodle:
+  mongodb:
+    embedded:
+      version: 5.0.5
+
+
+
+
+
 
 ---
 spring:
@@ -47,6 +59,12 @@ spring:
       username: user
       password: pwd
       authentication-database: admin
+
+
+
+
+
+
 
 
 
